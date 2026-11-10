@@ -1,0 +1,29 @@
+global
+    log /dev/log local0
+    log /dev/log local1 notice
+    chroot /var/lib/haproxy
+    stats socket /run/haproxy/admin.sock mode 660 level admin expose-fd listeners
+    stats timeout 30s
+    user haproxy
+    group haproxy
+    daemon
+
+defaults
+    log     global
+    mode    http
+    option  httplog
+    option  dontlognull
+    timeout connect 5000
+    timeout client  50000
+    timeout server  50000
+
+frontend my_frontend
+    bind *:80
+    bind *:443 ssl crt /etc/haproxy/certs/www.ymutunzi.me.pem
+    http-request set-header X-Forwarded-Proto https
+    default_backend my_backend
+
+backend my_backend
+    balance roundrobin
+    server 7109-web-01 13.40.18.231:80 check
+    server 7109-web-02 13.135.253.80:80 check
