@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# Script to display information about subdomains
+# shellcheck disable=SC2086
+
+display_info() {
+    dig +noall +answer "$1.$2" | awk -v sdom="$1" '{print "The subdomain " sdom " is a " $4 " record and points to " $5}'
+}
+
+if [ "$#" -eq 1 ]; then
+    display_info "www" "$1"
+    display_info "lb-01" "$1"
+    display_info "web-01" "$1"
+    display_info "web-02" "$1"
+elif [ "$#" -eq 2 ]; then
+    display_info "$2" "$1"
+fi
